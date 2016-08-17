@@ -197,3 +197,87 @@ JSON是对象，可以包含一些嵌套类型，或者`null`等。
 "array_with_null_value":    [ null ]
 ```
 
+### 多层级对象
+对于多层级对象:
+```json
+{
+    "tweet":            "Elasticsearch is very flexible",
+    "user": {
+        "id":           "@johnsmith",
+        "gender":       "male",
+        "age":          26,
+        "name": {
+            "full":     "John Smith",
+            "first":    "John",
+            "last":     "Smith"
+        }
+    }
+}
+```
+
+ES会生成这样的Mapping:
+```json
+{
+  "gb": {
+    "tweet": { 
+      "properties": {
+        "tweet":            { "type": "string" },
+        "user": { 
+          "type":             "object",
+          "properties": {
+            "id":           { "type": "string" },
+            "gender":       { "type": "string" },
+            "age":          { "type": "long"   },
+            "name":   { 
+              "type":         "object",
+              "properties": {
+                "full":     { "type": "string" },
+                "first":    { "type": "string" },
+                "last":     { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+多级Object表现就和根对象(*root object*)，只是缺少了某些元数据，如`_source`,`_all`等。
+
+Lucence并不能理解这种嵌套对象，所以ES会转成这种对象:
+```json
+{
+    "tweet":            [elasticsearch, flexible, very],
+    "user.id":          [@johnsmith],
+    "user.gender":      [male],
+    "user.age":         [26],
+    "user.name.full":   [john, smith],
+    "user.name.first":  [john],
+    "user.name.last":   [smith]
+}
+```
+
+对于数组类型的对象:
+```json
+{
+    "followers": [
+        { "age": 35, "name": "Mary White"},
+        { "age": 26, "name": "Alex Jones"},
+        { "age": 19, "name": "Lisa Smith"}
+    ]
+}
+```
+
+会解析成这样:
+```json
+{
+    "followers.age":    [19, 26, 35],
+    "followers.name":   [alex, jones, lisa, smith, mary, white]
+}
+```
+
+需要注意的是，数组在ES中只是*一袋值*，而不是*有序值*。所以你只能查出*有没有26岁的followers*，但是你不能得到这样准确的问题*有没有一个叫Alex Jones的26岁的followers?*
+
+> 更多细节参考官方文档[Nested Objects](https://www.elastic.co/guide/en/elasticsearch/guide/current/nested-objects.html)
