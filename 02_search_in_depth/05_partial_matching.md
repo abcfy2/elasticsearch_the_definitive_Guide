@@ -1,7 +1,6 @@
-###部分匹配
-邮政编码和结构化数据  
-
-```
+# 部分匹配
+# 邮政编码和结构化数据  
+```json
 PUT /my_index
 {
   "mappings": {
@@ -16,9 +15,9 @@ PUT /my_index
   }
 }
 ```
-插入数据
 
-```
+插入数据
+```json
 PUT /my_index/address/_bulk
 {"index":{"_id":1}}
 {"postcode":"W1V 3DG"}
@@ -31,9 +30,9 @@ PUT /my_index/address/_bulk
 {"index":{"_id":5}}
 {"postcode":"SW5 0BE"}
 ```
-查询条件
 
-```
+查询条件
+```json
 GET /my_index/address/_search
 {
   "query": {
@@ -43,9 +42,9 @@ GET /my_index/address/_search
   }
 }
 ```
-查询的结果
 
-```
+查询的结果
+```json
   "hits": {
     "total": 2,
     "max_score": 1,
@@ -70,19 +69,19 @@ GET /my_index/address/_search
       }
     ]
   }
-}
 ```
+
 prefix 查询是低级别的查询，它在查询之前不会对query string分词。
-Tip prefix查询和filter很相似，默认情况下不会计分，即给所有返回的结果_score 都是1，filter和prefix的唯一区别是prefix不会缓存。
+> **Tip** prefix查询和filter很相似，默认情况下不会计分，即给所有返回的结果_score 都是1，filter和prefix的唯一区别是prefix不会缓存。
 为了支持动态前缀匹配，查询将执行以下操作： 
 - 略过条件列表找到w1开始的位置
 - 收集有关联文档的ID
 - 移到下一个条件
 - 如果条件仍然是从w1开始，查询重复第二步直到结束。  
 `注意` prefix查询在查询条件少时能够自由的使用，但是在大规模使用时会对集群造成很大的压力。尝试使用长的前缀，以减少它们对集群的影响。这会减少对集群访问的项数。  
-通配和正则查询  
 
-```
+通配和正则查询  
+```json
 GET /my_index/address/_search
 {
   "query": {
@@ -92,9 +91,9 @@ GET /my_index/address/_search
   }
 }
 ```
-结果为  
 
-```
+结果为  
+```json
   "hits": {
     "total": 2,
     "max_score": 1,
@@ -119,11 +118,10 @@ GET /my_index/address/_search
       }
     ]
   }
-}
 ```
-正则表达式查询
 
-```
+# 正则表达式查询
+```json
 GET /my_index/address/_search
 {
   "query": {
@@ -133,9 +131,9 @@ GET /my_index/address/_search
   }
 }
 ```
-查询的结果
 
-```
+查询的结果
+```json
   "hits": {
     "total": 3,
     "max_score": 1,
@@ -169,19 +167,20 @@ GET /my_index/address/_search
       }
     ]
   }
-}
 ```
+
 `注意` prefix，wildcard，regexp是条件操作，如果使用它们来查询已分词的字段，它们将检查该字段的每个条件，而不是把它们看做一个整体。
-Ngrams 部分匹配  
+
+# Ngrams 部分匹配  
 如查询单词quick    
 - Length 1 (unigram): [ q, u, i, c, k ]
 - Length 2 (bigram): [ qu, ui, ic, ck ]
 - Length 3 (trigram): [ qui, uic, ick ]
 - Length 4 (four-gram): [ quic, uick ]
 - Length 5 (five-gram): [ quick ]
-例如
 
-```
+例如
+```json
 PUT /my_index
 {
   "settings": {
@@ -208,18 +207,18 @@ PUT /my_index
   }
 }
 ```
-edge_ngram是一种type，我们自己定义了一个filter方法`autocomplete_filter`定义了最长和最短的模式。其本身是有分词的。
 
-```
+edge_ngram是一种type，我们自己定义了一个filter方法`autocomplete_filter`定义了最长和最短的模式。其本身是有分词的。
+```json
 GET /my_index/_analyze
 {
   "analyzer": "autocomplete",
   "text": "quick brown"
 }
 ```
-结果
 
-```markdown
+结果
+```json
 {
   "tokens": [
     {
@@ -295,10 +294,10 @@ GET /my_index/_analyze
   ]
 }
 ```
+
 这是一种比正则更高效的查询方式。
 看下面的例子
-
-```
+```json
 PUT /my_index/_mapping/my_type
 {
     "my_type": {
@@ -311,17 +310,16 @@ PUT /my_index/_mapping/my_type
     }
 }
 ```
-
-```
+```json
 POST /my_index/my_type/_bulk
 { "index": { "_id": 1            }}
 { "name": "Brown foxes"    }
 { "index": { "_id": 2            }}
 { "name": "Yellow furballs" }
 ```
-查询字段
 
-```
+查询字段
+```json
 GET /my_index/my_type/_search
 {
     "query": {
@@ -331,11 +329,9 @@ GET /my_index/my_type/_search
     }
 }
 ```
+
 结果
-
-```markdown
-{
-
+```json
   "hits": [
      {
         "_id": "1",
@@ -352,7 +348,6 @@ GET /my_index/my_type/_search
         }
      }
   ]
-}
 ```
-具体请看[Index-Time Search-as-You-Type](https://www.elastic.co/guide/en/elasticsearch/guide/2.x/_index_time_search_as_you_type.html)
 
+具体请看[Index-Time Search-as-You-Type](https://www.elastic.co/guide/en/elasticsearch/guide/2.x/_index_time_search_as_you_type.html)
