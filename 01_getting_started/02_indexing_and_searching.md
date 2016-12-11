@@ -3,7 +3,7 @@
 
 ## index vs index vs index
 ES术语中有多个index出现，这里做一下词义辨析。
-- `Index (noun)`: 做名词时，类似与关系性数据库的*数据库*概念，存储着相关的文档。负数形式为*indices*或*indexes*
+- `Index (noun)`: 做名词时，类似与关系性数据库的*数据库*概念，存储着相关的文档。复数形式为*indices*或*indexes*
 - `Index (verb)`: ***To index a document*** is to store a document in an ***index (noun)*** so that it can be retrieved and queried. It is much like the **INSERT** keyword in SQL except that, if the document already exists, the new document would replace the old.
 - `Inverted index`: 倒排索引，详情参见官方文档: https://www.elastic.co/guide/en/elasticsearch/guide/current/inverted-index.html
 
